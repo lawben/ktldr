@@ -26,6 +26,10 @@ def write_clipping(clipping: Match, file: IO[str]) -> None:
     file.write(f"- {content}\n")
 
 
+def is_partial_highlight(current_clip: Match, next_clip: Match) -> bool:
+    return current_clip.group("content") in next_clip.group("content")
+
+
 def process_clippings_per_book(
     title: str, clippings: List[Match], output_path: str
 ) -> None:
@@ -33,8 +37,14 @@ def process_clippings_per_book(
     file_name = os.path.join(output_path, f"{encode_title(title)}-TLDR.md")
     with open(file_name, "w") as out_file:
         out_file.write(f"# TLDR for: {title}\n")
-        for matched_clip in sorted_clippings:
-            write_clipping(matched_clip, out_file)
+        for i in range(len(sorted_clippings) - 1):
+            if is_partial_highlight(sorted_clippings[i], sorted_clippings[i + 1]):
+                # Is partial match, next clip contains better version
+                continue
+            write_clipping(sorted_clippings[i], out_file)
+
+        # Write last clip as itt cannot be partial
+        write_clipping(sorted_clippings[-1], out_file)
 
 
 def process_all_clippings(clippings: str, output_path: str) -> None:
