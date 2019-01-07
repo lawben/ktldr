@@ -1,6 +1,6 @@
 # kTLDR
 
-kTLDR is a small script to extract your highlights from your Kindle.
+***kTLDR*** is a small script to extract your highlights from your Kindle. You can read your highlights as a quick recap of the book, but not only from your Kindle. All highlights are sorted by their location in the book and are stored in a separate file for each book.
 
 ### Usage:
 ```sh
