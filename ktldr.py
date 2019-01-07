@@ -12,6 +12,10 @@ CLIPPING_ENTRY_RE = re.compile(
 )
 
 
+def get_content_from_match(match: Match) -> str:
+    return match.group("content")
+
+
 def encode_title(title: str) -> str:
     return title.replace(" ", "_")
 
@@ -22,12 +26,12 @@ def read_clippings(kindle_path: str) -> str:
 
 
 def write_clipping(clipping: Match, file: IO[str]) -> None:
-    content = clipping.group("content").replace("\n", " ")
+    content = get_content_from_match(clipping).replace("\n", " ")
     file.write(f"- {content}\n")
 
 
 def is_partial_highlight(current_clip: Match, next_clip: Match) -> bool:
-    return current_clip.group("content") in next_clip.group("content")
+    return get_content_from_match(current_clip) in get_content_from_match(next_clip)
 
 
 def process_clippings_per_book(
@@ -36,11 +40,20 @@ def process_clippings_per_book(
     sorted_clippings = sorted(clippings, key=lambda clip: clip.group("location_start"))
     file_name = os.path.join(output_path, f"{encode_title(title)}-TLDR.md")
     with open(file_name, "w") as out_file:
-        out_file.write(f"# TLDR for: {title}\n")
+        out_file.write(f"# TLDR for {title}\n")
         for i in range(len(sorted_clippings) - 1):
-            if is_partial_highlight(sorted_clippings[i], sorted_clippings[i + 1]):
-                # Is partial match, next clip contains better version
+            clip = sorted_clippings[i]
+            next_clip = sorted_clippings[i + 1]
+            previous_clip = sorted_clippings[i - 1]
+
+            if is_partial_highlight(clip, next_clip):
+                # Is partial match, nextclip contains better version
                 continue
+
+            if is_partial_highlight(clip, previous_clip):
+                # Is partial match, previous clip contains better version
+                continue
+
             write_clipping(sorted_clippings[i], out_file)
 
         # Write last clip as itt cannot be partial
