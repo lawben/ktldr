@@ -3,7 +3,7 @@
 kTLDR is a small script to extract your highlights from your Kindle.
 
 ### Usage:
-```
+```sh
 > python3 ktldr.py /path/to/kindle /path/to/output_dir
 ```
 The output directory must exist already.
