@@ -84,7 +84,7 @@ def main(kindle_path: str, output_path: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Need to specify /path/to/kindle and /path/to/output_dir")
+        print("USAGE:\n> python3 ktldr.py /path/to/kindle /path/to/output_dir")
         sys.exit(1)
 
     main(sys.argv[1], sys.argv[2])
