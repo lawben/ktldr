@@ -8,7 +8,7 @@ CLIPPINGS_PATH = "documents/My Clippings.txt"
 CLIPPINGS_DELIM = "==========\n"
 
 CLIPPING_ENTRY_RE = re.compile(
-    r"^(?P<title>.*)\s*\n- Your Highlight (on|at) (?P<location_type>page|location) (?P<location_start>\d+)-(?P<location_end>\d+) \| Added on (?P<date>.+?, \d{1,2} .+? \d{4} \d{2}:\d{2}:\d{2})\s*\n(?P<content>.*)"
+    r"^(?P<title>.*)\s*\n- Your Highlight (on page \d+|on|at)\s?\|? (?P<location_type>page|location) (?P<location_start>\d+)-(?P<location_end>\d+) \| Added on (?P<date>.+?, \d{1,2} .+? \d{4} \d{2}:\d{2}:\d{2})\s*\n(?P<content>.*)"
 )
 
 
@@ -37,7 +37,7 @@ def is_partial_highlight(current_clip: Match, next_clip: Match) -> bool:
 def process_clippings_per_book(
     title: str, clippings: List[Match], output_path: str
 ) -> None:
-    sorted_clippings = sorted(clippings, key=lambda clip: clip.group("location_start"))
+    sorted_clippings = sorted(clippings, key=lambda clip: int(clip.group("location_start")))
     file_name = os.path.join(output_path, f"{encode_title(title)}-TLDR.md")
     with open(file_name, "w") as out_file:
         out_file.write(f"# TLDR for {title}\n")
