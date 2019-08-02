@@ -39,15 +39,18 @@ def process_clippings_per_book(
 ) -> None:
     sorted_clippings = sorted(clippings, key=lambda clip: int(clip.group("location_start")))
     file_name = os.path.join(output_path, f"{encode_title(title)}-TLDR.md")
-    with open(file_name, "w") as out_file:
-        out_file.write(f"# TLDR for {title}\n")
+    file_already_exists = os.path.exists(file_name)
+    with open(file_name, "a") as out_file:
+        if not file_already_exists:
+            out_file.write(f"# TLDR for {title}\n")
+
         for i in range(len(sorted_clippings) - 1):
             clip = sorted_clippings[i]
             next_clip = sorted_clippings[i + 1]
             previous_clip = sorted_clippings[i - 1]
 
             if is_partial_highlight(clip, next_clip):
-                # Is partial match, nextclip contains better version
+                # Is partial match, next clip contains better version
                 continue
 
             if is_partial_highlight(clip, previous_clip):
@@ -56,7 +59,7 @@ def process_clippings_per_book(
 
             write_clipping(sorted_clippings[i], out_file)
 
-        # Write last clip as itt cannot be partial
+        # Write last clip as it cannot be partial
         write_clipping(sorted_clippings[-1], out_file)
 
 
@@ -77,9 +80,15 @@ def process_all_clippings(clippings: str, output_path: str) -> None:
         process_clippings_per_book(title, book_clippings, output_path)
 
 
+def delete_clippings_file(kindle_path: str) -> None:
+    # Clear content of clippings file
+    open(os.path.join(kindle_path, CLIPPINGS_PATH), "w").close()
+
+
 def main(kindle_path: str, output_path: str) -> None:
     clippings = read_clippings(kindle_path)
     process_all_clippings(clippings, output_path)
+    delete_clippings_file(kindle_path)
 
 
 if __name__ == "__main__":
