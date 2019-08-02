@@ -17,7 +17,11 @@ def get_content_from_match(match: Match) -> str:
 
 
 def encode_title(title: str) -> str:
-    return title.replace(" ", "_").replace("(", "").replace(")", "").replace(",", "")
+    return title.replace(" ", "_") \
+                .replace("(", "") \
+                .replace(")", "") \
+                .replace(",", "") \
+                .replace(":", "")
 
 
 def read_clippings(kindle_path: str) -> str:
